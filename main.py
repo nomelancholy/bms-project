@@ -3,9 +3,6 @@ import shutil
 import random
 import pandas as pd
 
-groups = ['Acc', 'Acc Back', 'Acc Eye', 'BG', 'Body', 'Buri', 'Eye', 'Hair', 'Head']
-grades_dic = {"a": 0.01, "b": 0.03, "c": 0.06, "d": 0.1, "e": 0.3, "f": 0.5}
-
 # dictionary 세팅
 acc_dic = {}
 acc_back_dic = {}
@@ -19,23 +16,22 @@ head_dic = {}
 
 FOLDER_PATH = "C:/Users/starm/Desktop/bms"
 GROUP_FOLDER_PATH = "C:/dev/workspace/bms-project/group/"
-SOURCE_FOLDER_PATH = "C:/dev/workspace/bms-project/source/"
 
 FILENAME_EXTENSION = ".png"
 
 #  후보 pool
 pool = []
 
-# 선택된 횟수 체크
-
 # 엑셀 저장용 데이터
-accessory = []
-background = []
+acc = []
+acc_back = []
+acc_eye = []
+bg = []
 body = []
-clothes = []
-face = []
+buri = []
+eye = []
 hair = []
-total_probability = []
+head = []
 
 
 # 붙여넣을 대상 폴더 생성
@@ -85,62 +81,74 @@ def create_dictionary():
 # 조합 생성
 def create_combination():
 
-    combination = {}
+    groups = [acc_dic, acc_back_dic, acc_eye_dic, bg_dic, body_dic, buri_dic, eye_dic, hair_dic, head_dic]
 
-    # 종합 확률
-    total_p = 0
+    combination = {}
 
     # 그룹마다 하나씩 뽑아야 함
     for group in groups:
-        # 가중치 기준 랜덤으로 생성 (소수점 두자리까지)
-        pivot = round(random.random(), 2)
 
-        # 가산 변수
-        acc = 0
+        index = random.randint(1, len(group.keys())) - 1
 
+        # 부분별로 조합 생성
+        combination[list(group)[index].split('_')[0]] = list(group)[index]
 
-
-        # 등급 dictionary 순회
-        for key, value in grades_dic.items():
-            print(key)
-            print(value)
-            # 각 등급별 가중치 값을 더하고
-            acc += value
-            # 더해진 값이 기준값보다 크거나 같은지 확인
-            if acc >= pivot:
-                # 맞다면 조합에 추가
-                combination[group] = key
-                # 당첨된 등급의 확률 값 종합 확률에 추가
-                total_p += value
-                break
-    
-    # 종합 확률도 조합 정보에 추가
-    # 종합 확률을 6으로 나누면 최대가 0.5가 되기 때문에 한번 더 나눠준 값으로 세팅
-    combination['total_probability'] = round(total_p / (len(groups)/2), 2)
-
-    print(combination)
-
-    # pool에 이미 있지 않은 값이 맞다면
     if combination not in pool:
-        # 추가
         pool.append(combination)
+
+        # 엑셀 목록 생성
+        acc.append(combination['Acc'])
+        acc_back.append(combination['Acc Back'])
+        acc_eye.append(combination['Acc Eye'])
+        bg.append(combination['BG'])
+        body.append(combination['Body'])
+        buri.append(combination['Buri'])
+        eye.append(combination['Eye'])
+        hair.append(combination['Hair'])
+        head.append(combination['Head'])
         
-        # 엑셀 저장을 위해 각 소스별 배열 생성
-        accessory.append(combination['accessory'])
-        background.append(combination['background'])
-        body.append(combination['body'])
-        clothes.append(combination['clothes'])
-        face.append(combination['face'])
-        hair.append(combination['hair'])
-        total_probability.append(combination['total_probability'])
+        # 숫자 감산 or dict에서 삭제
+        selected_parts = combination.values()
+
+        for part in selected_parts:
+
+            dic = {}
+
+            part_name = part.split("_")[0]
+
+            if part_name == 'Acc':
+                dic = acc_dic
+            elif part_name == 'Acc Back':
+                dic = acc_back_dic
+            elif part_name == 'Acc Eye':
+                dic = acc_eye_dic
+            elif part_name == 'BG':
+                dic = bg_dic
+            elif part_name == 'Body':
+                dic = body_dic
+            elif part_name == 'Buri':
+                dic = buri_dic
+            elif part_name == 'Eye':
+                dic = eye_dic
+            elif part_name == 'Hair':
+                dic = hair_dic
+            elif part_name == 'Head':
+                dic = head_dic
+
+            existing_count = dic[part]
+
+            if existing_count - 1 == 0:
+                del dic[part]
+            else:
+                dic[part] = existing_count - 1
 
 
 def save_to_excel():
 
-    raw_data = {'accessory': accessory, 'background': background, 'body': body, 'clothes': clothes, 'face': face, 'hair': hair, 'total_probability': total_probability}
+    raw_data = {'acc': acc, 'acc_back': acc_back, 'acc_eye': acc_eye, 'bg': bg, 'body': body, 'buri': buri, 'eye': eye, 'hair': hair, 'head': head}
     excel_data = pd.DataFrame(raw_data)
 
-    excel_data.to_excel(FOLDER_PATH+"/sample.xlsx")
+    excel_data.to_excel(FOLDER_PATH + "/combination_list.xlsx")
 
 
 def file_copy():
@@ -151,18 +159,12 @@ def file_copy():
         os.makedirs(to_path)
 
         for key, value in combination.items():
-            # 종합 확률 정보가 아니면
-            if key != 'total_probability':
-                _from = "./group/" + key + "/" + key + "_" + value + FILENAME_EXTENSION
-                shutil.copyfile(_from, to_path + "/" + key + "_" + value + FILENAME_EXTENSION)
-
+            _from = "./copy_items/" + key + "/" + value + FILENAME_EXTENSION
+            shutil.copyfile(_from, to_path + "/" + value + FILENAME_EXTENSION)
 
 
 def name_change():
     group_list = os.listdir(GROUP_FOLDER_PATH)
-
-    # print("group_list")
-    # print(group_list)
 
     for group in group_list:
         path = GROUP_FOLDER_PATH + group
@@ -179,11 +181,8 @@ def name_change():
 
             os.rename(src, dst)
 
-        # print("file_list")
-        # print(file_list)
 
-
-def temp_count_set():
+def multiple_count_number():
 
     group_list = os.listdir(GROUP_FOLDER_PATH)
 
@@ -192,19 +191,14 @@ def temp_count_set():
         file_list = os.listdir(path)
 
         for file in file_list:
-            change_name = file.replace(".", "_10.")
+            file_name_list = file.split('_')
+            extend_number = int(file_name_list[2].replace(FILENAME_EXTENSION, '')) * 2
+            change_name = file_name_list[0] + "_" + file_name_list[1] + "_" + str(extend_number) + ".png"
 
             src = path + "/" + file
             dst = path + "/" + change_name
 
-
-
             os.rename(src, dst)
-
-        # print("file_list")
-        # print(file_list)
-
-
 
 
 # 붙여넣을 대상 폴더 생성
@@ -213,21 +207,35 @@ def temp_count_set():
 # 폴더 내 파일들 딕셔너리로 생성
 create_dictionary()
 
-
+# 조합 생성
+# create_combination()
 
 # pool 갯수가 10000개가 될 때 까지
-# while len(pool) < 10000:
+while len(pool) < 10000:
     # 조합 생성
-    # create_combination()
+    create_combination()
 
+# print(pool)
+print(acc_dic)
+print(acc_back_dic)
+print(acc_eye_dic)
+print(bg_dic)
+print(body_dic)
+print(buri_dic)
+print(eye_dic)
+print(hair_dic)
+print(head_dic)
+
+
+# print(pool)
 # 목록 엑셀 다운로드
-# save_to_excel()
+save_to_excel()
 
 # 파일 복사
-# file_copy()
+file_copy()
 
 # 이름 변경 작업
 # name_change()
 
-# 감산할 반복 횟수 임시 세팅
-# temp_count_set()
+# 횟수 곱셈
+# multiple_count_number()
