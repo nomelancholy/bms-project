@@ -155,7 +155,7 @@ def file_copy():
 
     for index, combination in enumerate(pool):
         # 붙여넣을 폴더 생성
-        to_path = FOLDER_PATH+"/"+str(index)
+        to_path = FOLDER_PATH+"/"+str(index + 1)
         os.makedirs(to_path)
 
         for key, value in combination.items():
