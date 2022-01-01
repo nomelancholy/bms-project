@@ -18,7 +18,8 @@ hair_dic = {}
 head_dic = {}
 
 FOLDER_PATH = "C:/Users/starm/Desktop/bms"
-GROUP_FOLER_PATH = "C:/dev/workspace/bms-project/group/"
+GROUP_FOLDER_PATH = "C:/dev/workspace/bms-project/group/"
+SOURCE_FOLDER_PATH = "C:/dev/workspace/bms-project/source/"
 
 FILENAME_EXTENSION = ".png"
 
@@ -46,13 +47,13 @@ def create_folder(folder_path):
         print("Error")
 
 
+# 폴더 내 파일들 딕셔너리로 생성
 def create_dictionary():
-    group_list = os.listdir(GROUP_FOLER_PATH)
+    group_list = os.listdir(GROUP_FOLDER_PATH)
 
     for group in group_list:
 
-        # locals()['{}_data'.format(group)] = {}
-        path = GROUP_FOLER_PATH + group
+        path = GROUP_FOLDER_PATH + group
         file_list = os.listdir(path)
 
         dic = {}
@@ -78,13 +79,7 @@ def create_dictionary():
 
         for file in file_list:
             file_set_list = file.split("_")
-            dic[file_set_list[0]] = int(file_set_list[1].replace(FILENAME_EXTENSION, ''))
-
-
-def folder_read():
-    file_list = os.listdir(GROUP_FOLER_PATH)
-
-    print(file_list)
+            dic[file_set_list[0] + "_" + file_set_list[1]] = int(file_set_list[2].replace(FILENAME_EXTENSION, ''))
 
 
 # 조합 생성
@@ -164,13 +159,13 @@ def file_copy():
 
 
 def name_change():
-    group_list = os.listdir(GROUP_FOLER_PATH)
+    group_list = os.listdir(GROUP_FOLDER_PATH)
 
     # print("group_list")
     # print(group_list)
 
     for group in group_list:
-        path = GROUP_FOLER_PATH + group
+        path = GROUP_FOLDER_PATH + group
         file_list = os.listdir(path)
 
         for file in file_list:
@@ -190,10 +185,10 @@ def name_change():
 
 def temp_count_set():
 
-    group_list = os.listdir(GROUP_FOLER_PATH)
+    group_list = os.listdir(GROUP_FOLDER_PATH)
 
     for group in group_list:
-        path = GROUP_FOLER_PATH + group
+        path = GROUP_FOLDER_PATH + group
         file_list = os.listdir(path)
 
         for file in file_list:
@@ -215,10 +210,8 @@ def temp_count_set():
 # 붙여넣을 대상 폴더 생성
 # create_folder(FOLDER_PATH)
 
-# 폴더별 파일들 확인하구 딕셔너리 생성
+# 폴더 내 파일들 딕셔너리로 생성
 create_dictionary()
-
-# folder_read()
 
 
 
