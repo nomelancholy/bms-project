@@ -6,6 +6,17 @@ import pandas as pd
 groups = ['Acc', 'Acc Back', 'Acc Eye', 'BG', 'Body', 'Buri', 'Eye', 'Hair', 'Head']
 grades_dic = {"a": 0.01, "b": 0.03, "c": 0.06, "d": 0.1, "e": 0.3, "f": 0.5}
 
+# dictionary 세팅
+acc_dic = {}
+acc_back_dic = {}
+acc_eye_dic = {}
+bg_dic = {}
+body_dic = {}
+buri_dic = {}
+eye_dic = {}
+hair_dic = {}
+head_dic = {}
+
 FOLDER_PATH = "C:/Users/starm/Desktop/bms"
 GROUP_FOLER_PATH = "C:/dev/workspace/bms-project/group/"
 
@@ -34,10 +45,47 @@ def create_folder(folder_path):
     except OSError:
         print("Error")
 
+
+def create_dictionary():
+    group_list = os.listdir(GROUP_FOLER_PATH)
+
+    for group in group_list:
+
+        # locals()['{}_data'.format(group)] = {}
+        path = GROUP_FOLER_PATH + group
+        file_list = os.listdir(path)
+
+        dic = {}
+
+        if group == 'Acc':
+            dic = acc_dic
+        elif group == 'Acc Back':
+            dic = acc_back_dic
+        elif group == 'Acc Eye':
+            dic = acc_eye_dic
+        elif group == 'BG':
+            dic = bg_dic
+        elif group == 'Body':
+            dic = body_dic
+        elif group == 'Buri':
+            dic = buri_dic
+        elif group == 'Eye':
+            dic = eye_dic
+        elif group == 'Hair':
+            dic = hair_dic
+        elif group == 'Head':
+            dic = head_dic
+
+        for file in file_list:
+            file_set_list = file.split("_")
+            dic[file_set_list[0]] = int(file_set_list[1].replace(FILENAME_EXTENSION, ''))
+
+
 def folder_read():
     file_list = os.listdir(GROUP_FOLER_PATH)
 
     print(file_list)
+
 
 # 조합 생성
 def create_combination():
